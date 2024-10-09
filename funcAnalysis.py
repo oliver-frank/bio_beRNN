@@ -12,7 +12,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from nilearn import plotting
 import matplotlib.pyplot as plt
 
-import networkx as nx # info: Need to extract an graph first from your matrices
+# import networkx as nx # info: Need to extract an graph first from your matrices
 
 def convert_atlas_to_4d(atlas_img):
     """
@@ -37,7 +37,7 @@ def convert_atlas_to_4d(atlas_img):
     return atlas_4d_img
 
 
-
+# attention: Preprocess 03 again with right folder naming ..
 # info: Cosine similiarity matrix for individual tasks subject-wise ####################################################
 participants = ['sub-SNIP6IECX02'] # , 'sub-SNIP96WID02', 'sub-SNIPDKHPB02', 'sub-SNIPKPB8402', 'sub-SNIPYL4AS02'
 # participants = ['sub-SNIP6IECX01']
@@ -54,8 +54,8 @@ for participant in participants:
         
         You should take a different one when analyzing brain networks representing activity during certain tasks.
         '''
-        # atlas, mode  = datasets.fetch_atlas_msdl(data_dir=data_dir), 'msdl' # 39 regions - broader cognitive function like default mode network, visual and motor; based on resting state
-        atlas, mode = datasets.fetch_atlas_aal(data_dir=data_dir), 'aal' # 116 to 120 regions - Anatomical studies - anatomy based
+        atlas, mode  = datasets.fetch_atlas_msdl(data_dir=data_dir), 'msdl' # 39 regions - broader cognitive function like default mode network, visual and motor; based on resting state
+        # atlas, mode = datasets.fetch_atlas_aal(data_dir=data_dir), 'aal' # 116 to 120 regions - Anatomical studies - anatomy based
         # atlas, mode = datasets.fetch_atlas_yeo_2011(data_dir=data_dir), 'yeo' # 7 to 17 subnetworks - studies involving broad functional networks # fix: not implemented yet
         # atlas, mode = datasets.fetch_atlas_basc_multiscale_2015(data_dir=data_dir), 'basc' # 64 to 444 regions - network analysis - resting state based
 
@@ -65,10 +65,11 @@ for participant in participants:
             labels = atlas["labels"]
         elif mode == 'basc':
             map = '036'
-            atlas_filename = atlas[f"scale{map}"] # valid parcallations are {007, 012, 020, 036, 064, 122, 197, 325, 444}
+            atlas_filename = atlas[f"scale{map}"] # valid parcellations are {007, 012, 020, 036, 064, 122, 197, 325, 444}
             labels = None
 
         # Step 2: Define paths for your data and confounds
+        # subject_directory = os.path.join('Z:\\Desktop\\BackUp\\BrainModels', f'{participant}', 'func')
         subject_directory = os.path.join('W:\\group_csp\\analyses\\oliver.frank\\Brain_models\\derivatives\\fmriprep', f'{participant}', 'func')
 
         subjectDictionary = {
@@ -130,8 +131,8 @@ for participant in participants:
         # Step 5: Use NiftiMapsMasker with the corrected confounds DataFrame
         masker = NiftiMapsMasker(
             maps_img=subjectDictionary['maps'],
-            standardize=True, # 'zscore'
-            standardize_confounds=True, # 'zscore'
+            standardize='zscore', # 'zscore'
+            standardize_confounds='zscore', # 'zscore'
             resampling_target='data', # info: Important for mode = 'basc' as provided atlas map doesn't naturally have time dimension
             memory="nilearn_cache",
             verbose=5,
