@@ -16,7 +16,8 @@ participantDictionary = {
 }
 
 def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+    # return 1 / (1 + np.exp(-x))
+    return (x / np.max(np.abs(x))) + np.random.normal(0, 0.01, x.shape)
 
 def run_pipeline(base_path):
     participant = 'SNIP96WID01'
@@ -103,9 +104,9 @@ def run_pipeline(base_path):
         fiber_density[i, j] = len(sl_ids) / (mean_len * mean_size)
 
     fiber_density = (fiber_density + fiber_density.T) / 2
-    # fiber_density = sigmoid(fiber_density) # sig scaling
-    conn_matrix = np.log1p(conn_matrix) # log scaling
-    np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300_logNorm.npy'), fiber_density)
+    fiber_density = sigmoid(fiber_density) # sig scaling
+    # fiber_density = np.log1p(fiber_density) # log scaling
+    np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300_sigNorm.npy'), fiber_density)
 
     for res in [256, 128, 64, 32]:
         print(f"Downsampling to {res}×{res}...")
@@ -124,7 +125,7 @@ def run_pipeline(base_path):
 
         downsampled = (downsampled + downsampled.T) / 2
         downsampled /= downsampled.max()
-        np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}_logNorm.npy'), downsampled)
+        np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}_sigNorm.npy'), downsampled)
 
     print("All connectome matrices saved.")
 
