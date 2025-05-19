@@ -7,16 +7,7 @@ from dipy.tracking.utils import seeds_from_mask, connectivity_matrix
 from dipy.tracking.streamline import transform_streamlines, Streamlines
 from sklearn.cluster import KMeans
 
-participantDictionary = {
-    'SNIPKPB8401': 'beRNN_01',
-    'SNIPYL4AS01': 'beRNN_02',
-    'SNIP6IECX01': 'beRNN_03',
-    'SNIPDKHPB01': 'beRNN_04',
-    'SNIP96WID01': 'beRNN_05'
-}
-
-def run_pipeline(base_path):
-    participant = 'SNIP96WID01'
+def run_pipeline(base_path, participant):
     dwi_nii = os.path.join(base_path, 'dwi', f'025_sub-{participant}_diff_PA_257_eddy_corrected.nii.gz')
     bval = os.path.join(base_path, 'dwi', f'025_sub-{participant}_diff_PA_257.bval')
     bvec = os.path.join(base_path, 'dwi', f'025_sub-{participant}_diff_PA_257_eddy_corrected.eddy_rotated_bvecs')
@@ -113,7 +104,18 @@ def run_pipeline(base_path):
 
     print("All connectome matrices saved.")
 
+
+
+participantDictionary = {
+    'SNIPKPB8401': 'beRNN_01',
+    'SNIPYL4AS01': 'beRNN_02',
+    'SNIP6IECX01': 'beRNN_03',
+    'SNIPDKHPB01': 'beRNN_04',
+    'SNIP96WID01': 'beRNN_05'
+}
+
 # Run the pipeline:
-run_pipeline(r"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\beRNN_05\ses-01")
+participant = 'SNIPDKHPB01'
+run_pipeline(rf"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\{participantDictionary[participant]}\ses-01", participant)
 
 

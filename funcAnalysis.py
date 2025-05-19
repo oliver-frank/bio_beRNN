@@ -21,7 +21,7 @@ plt.ioff()
 participants = ['sub-SNIP6IECX', 'sub-SNIP96WID', 'sub-SNIPKPB84', 'sub-SNIPYL4AS'] # 'sub-SNIPDKHPB'
 recordings = ['05'] # ,
 modes = ['SCHAEFER'] # , 'AAL', 'MSDL'
-n_rois=200
+n_rois = 200
 tasks = ['faces', 'flanker', 'nback', 'rest', 'reward'] #  is for 03 MRI not working, let's wait for preprocessing 04 if same failure occurs
 data_dir = 'C:\\Users\\oliver.frank\\Desktop\\BackUp\\bio_BeRNN'
 directory = 'W:\\group_csp\\analyses\\oliver.frank\\brainModels'

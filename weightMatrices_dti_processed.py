@@ -7,20 +7,11 @@ from dipy.tracking.utils import seeds_from_mask, connectivity_matrix, length
 from dipy.tracking.streamline import transform_streamlines, Streamlines
 from sklearn.cluster import KMeans
 
-participantDictionary = {
-    'SNIPKPB8401': 'beRNN_01',
-    'SNIPYL4AS01': 'beRNN_02',
-    'SNIP6IECX01': 'beRNN_03',
-    'SNIPDKHPB01': 'beRNN_04',
-    'SNIP96WID01': 'beRNN_05'
-}
-
 def sigmoid(x):
     # return 1 / (1 + np.exp(-x))
     return (x / np.max(np.abs(x))) + np.random.normal(0, 0.01, x.shape)
 
-def run_pipeline(base_path):
-    participant = 'SNIP96WID01'
+def run_pipeline(base_path, participant):
     dwi_nii = os.path.join(base_path, 'dwi', f'025_sub-{participant}_diff_PA_257_eddy_corrected.nii.gz')
     bval = os.path.join(base_path, 'dwi', f'025_sub-{participant}_diff_PA_257.bval')
     bvec = os.path.join(base_path, 'dwi', f'025_sub-{participant}_diff_PA_257_eddy_corrected.eddy_rotated_bvecs')
@@ -104,9 +95,9 @@ def run_pipeline(base_path):
         fiber_density[i, j] = len(sl_ids) / (mean_len * mean_size)
 
     fiber_density = (fiber_density + fiber_density.T) / 2
-    fiber_density = sigmoid(fiber_density) # sig scaling
-    # fiber_density = np.log1p(fiber_density) # log scaling
-    np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300_sigNorm.npy'), fiber_density)
+    # fiber_density, mappingFunction = sigmoid(fiber_density), 'sigNorm' # sig scaling
+    fiber_density, mappingFunction = np.log1p(fiber_density), 'logNorm' # log scaling
+    np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300_{mappingFunction}.npy'), fiber_density)
 
     for res in [256, 128, 64, 32]:
         print(f"Downsampling to {res}×{res}...")
@@ -125,7 +116,7 @@ def run_pipeline(base_path):
 
         downsampled = (downsampled + downsampled.T) / 2
         downsampled /= downsampled.max()
-        np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}_sigNorm.npy'), downsampled)
+        np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}_{mappingFunction}.npy'), downsampled)
 
     print("All connectome matrices saved.")
 
@@ -142,5 +133,14 @@ def run_pipeline(base_path):
     print("Number of streamlines reaching labeled regions:", len(labels_hit))
     print("Unique regions hit by streamlines:", np.unique(labels_hit))
 
+participantDictionary = {
+    'SNIPKPB8401': 'beRNN_01',
+    'SNIPYL4AS01': 'beRNN_02',
+    'SNIP6IECX01': 'beRNN_03',
+    'SNIPDKHPB01': 'beRNN_04',
+    'SNIP96WID01': 'beRNN_05'
+}
+participant = 'SNIPDKHPB01'
+
 # Run the pipeline:
-run_pipeline(r"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\beRNN_05\ses-01")
+run_pipeline(rf"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\{participantDictionary[participant]}\ses-01", participant)

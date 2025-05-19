@@ -45,6 +45,3 @@ plt.show()
 
 
 
-# ATTENTION: DTI FOR STRUCTURAL ANALYSIS NEEDED !!!
-
-
