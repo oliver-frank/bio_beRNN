@@ -95,8 +95,8 @@ def run_pipeline(base_path, participant):
         fiber_density[i, j] = len(sl_ids) / (mean_len * mean_size)
 
     fiber_density = (fiber_density + fiber_density.T) / 2
-    # fiber_density, mappingFunction = sigmoid(fiber_density), 'sigNorm' # sig scaling
-    fiber_density, mappingFunction = np.log1p(fiber_density), 'logNorm' # log scaling
+    fiber_density, mappingFunction = sigmoid(fiber_density), 'sigNorm' # sig scaling
+    # fiber_density, mappingFunction = np.log1p(fiber_density), 'logNorm' # log scaling
     np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300_{mappingFunction}.npy'), fiber_density)
 
     for res in [256, 128, 64, 32]:
@@ -140,7 +140,9 @@ participantDictionary = {
     'SNIPDKHPB01': 'beRNN_04',
     'SNIP96WID01': 'beRNN_05'
 }
-participant = 'SNIPDKHPB01'
+participant = 'SNIP6IECX01'
 
 # Run the pipeline:
 run_pipeline(rf"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\{participantDictionary[participant]}\ses-01", participant)
+
+

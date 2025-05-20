@@ -115,7 +115,7 @@ participantDictionary = {
 }
 
 # Run the pipeline:
-participant = 'SNIPDKHPB01'
+participant = 'SNIP6IECX01'
 run_pipeline(rf"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\{participantDictionary[participant]}\ses-01", participant)
 
 
