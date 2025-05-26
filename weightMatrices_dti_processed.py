@@ -6,6 +6,7 @@ from dipy.reconst.dti import TensorModel, fractional_anisotropy
 from dipy.tracking.utils import seeds_from_mask, connectivity_matrix, length
 from dipy.tracking.streamline import transform_streamlines, Streamlines
 from sklearn.cluster import KMeans
+from scipy.ndimage import zoom
 
 def sigmoid(x):
     # return 1 / (1 + np.exp(-x))
@@ -99,24 +100,33 @@ def run_pipeline(base_path, participant):
     # fiber_density, mappingFunction = np.log1p(fiber_density), 'logNorm' # log scaling
     np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300_{mappingFunction}.npy'), fiber_density)
 
-    for res in [256, 128, 64, 32]:
-        print(f"Downsampling to {res}×{res}...")
-        unique_labels = np.unique(atlas_img)
-        unique_labels = unique_labels[unique_labels > 0]
-        label_indices = np.arange(len(unique_labels)).reshape(-1, 1)
-        kmeans = KMeans(n_clusters=res, random_state=42).fit(label_indices)
-        clustered_labels = kmeans.labels_
-        downsampled = np.zeros((res, res))
+    # for res in [256, 128, 64, 32]:
+    #     print(f"Downsampling to {res}×{res}...")
+    #     unique_labels = np.unique(atlas_img)
+    #     unique_labels = unique_labels[unique_labels > 0]
+    #     label_indices = np.arange(len(unique_labels)).reshape(-1, 1)
+    #     kmeans = KMeans(n_clusters=res, random_state=42).fit(label_indices)
+    #     clustered_labels = kmeans.labels_
+    #     downsampled = np.zeros((res, res))
+    #
+    #     for i in range(res):
+    #         idx_i = np.where(clustered_labels == i)[0]
+    #         for j in range(res):
+    #             idx_j = np.where(clustered_labels == j)[0]
+    #             downsampled[i, j] = np.mean(fiber_density[np.ix_(idx_i, idx_j)])
+    #
+    #     downsampled = (downsampled + downsampled.T) / 2
+    #     downsampled /= downsampled.max()
+    #     np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}_{mappingFunction}.npy'), downsampled)
 
-        for i in range(res):
-            idx_i = np.where(clustered_labels == i)[0]
-            for j in range(res):
-                idx_j = np.where(clustered_labels == j)[0]
-                downsampled[i, j] = np.mean(fiber_density[np.ix_(idx_i, idx_j)])
+    # Create one upsampled connectome weigth matrix
+    # conn_matrix is 300x300
+    upsampled_512 = zoom(fiber_density, (512 / 300, 512 / 300), order=1)  # bilinear interpolation
+    upsampled_512 = (upsampled_512 + upsampled_512.T) / 2  # ensure symmetry
+    upsampled_512 = upsampled_512[:512, :512]  # crop to exact size
+    upsampled_512 /= upsampled_512.max()
 
-        downsampled = (downsampled + downsampled.T) / 2
-        downsampled /= downsampled.max()
-        np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}_{mappingFunction}.npy'), downsampled)
+    np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_512_{mappingFunction}.npy'), upsampled_512.astype(np.float32))
 
     print("All connectome matrices saved.")
 
@@ -140,7 +150,7 @@ participantDictionary = {
     'SNIPDKHPB01': 'beRNN_04',
     'SNIP96WID01': 'beRNN_05'
 }
-participant = 'SNIP6IECX01'
+participant = 'SNIPKPB8401'
 
 # Run the pipeline:
 run_pipeline(rf"C:\Users\oliver.frank\Desktop\PyProjects\bio_BeRNN\weightMatrices_dwi\{participantDictionary[participant]}\ses-01", participant)
