@@ -82,26 +82,26 @@ def run_pipeline(base_path, participant):
     conn_matrix /= conn_matrix.max()
     np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_300.npy'), conn_matrix)
 
-    # for res in [256, 128, 64, 32]:
-    #     print(f"Downsampling to {res}×{res}...")
-    #     # Get unique atlas labels (excluding 0 = background)
-    #     unique_labels = np.unique(atlas_img)
-    #     unique_labels = unique_labels[unique_labels > 0]
-    #
-    #     # Cluster the unique label indices (not voxel values)
-    #     label_indices = np.arange(len(unique_labels)).reshape(-1, 1)
-    #     kmeans = KMeans(n_clusters=res, random_state=42).fit(label_indices)
-    #     clustered_labels = kmeans.labels_
-    #     downsampled = np.zeros((res, res))
-    #
-    #     for i in range(res):
-    #         idx_i = np.where(clustered_labels == i)[0]
-    #         for j in range(res):
-    #             idx_j = np.where(clustered_labels == j)[0]
-    #             downsampled[i, j] = np.mean(conn_matrix[np.ix_(idx_i, idx_j)])
-    #     downsampled = (downsampled + downsampled.T) / 2
-    #     downsampled /= downsampled.max()
-    #     np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}.npy'), downsampled)
+    for res in [256, 128, 64, 32]:
+        print(f"Downsampling to {res}×{res}...")
+        # Get unique atlas labels (excluding 0 = background)
+        unique_labels = np.unique(atlas_img)
+        unique_labels = unique_labels[unique_labels > 0]
+
+        # Cluster the unique label indices (not voxel values)
+        label_indices = np.arange(len(unique_labels)).reshape(-1, 1)
+        kmeans = KMeans(n_clusters=res, random_state=42).fit(label_indices)
+        clustered_labels = kmeans.labels_
+        downsampled = np.zeros((res, res))
+
+        for i in range(res):
+            idx_i = np.where(clustered_labels == i)[0]
+            for j in range(res):
+                idx_j = np.where(clustered_labels == j)[0]
+                downsampled[i, j] = np.mean(conn_matrix[np.ix_(idx_i, idx_j)])
+        downsampled = (downsampled + downsampled.T) / 2
+        downsampled /= downsampled.max()
+        np.save(os.path.join(out_path, f'connectome_{participantDictionary[participant]}_{res}.npy'), downsampled)
 
     # Create one upsampled connectome weigth matrix
     # conn_matrix is 300x300
